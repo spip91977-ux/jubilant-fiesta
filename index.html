@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KJ Land Surveyors — Go Live Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#0a1628;--mid:#1e4a7a;--gold:#d4a017;--gold-l:#f0c040;
+  --bg:#050b14;--panel:#0c1a28;--panel2:#101e2e;
+  --border:rgba(212,160,23,0.15);--border2:rgba(255,255,255,0.07);
+  --text:#e8f0f8;--muted:#4a6070;
+  --green:#22c55e;--red:#f87171;--blue:#60a5fa;--purple:#a78bfa;
+}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;line-height:1.6;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(212,160,23,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(212,160,23,.025) 1px,transparent 1px);background-size:28px 28px;pointer-events:none;z-index:0;}
+
+/* LAYOUT */
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:240px;background:rgba(5,11,20,0.97);border-right:1px solid var(--border);z-index:100;overflow-y:auto;padding:24px 0;}
+.sidebar::-webkit-scrollbar{width:3px;}.sidebar::-webkit-scrollbar-thumb{background:var(--border);}
+.sb-brand{padding:0 20px 20px;border-bottom:1px solid var(--border);margin-bottom:16px;}
+.sb-kj{width:36px;height:36px;background:linear-gradient(135deg,#d97706,#f0c040);border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:14px;font-weight:800;color:#000;margin-bottom:10px;}
+.sb-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:800;color:var(--gold-l);}
+.sb-sub{font-size:10px;color:var(--muted);}
+.sb-section{padding:0 16px;margin-bottom:8px;}
+.sb-section-label{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:700;padding:0 4px;margin-bottom:6px;}
+.sb-link{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:8px;cursor:pointer;font-size:12px;color:var(--muted);transition:all .15s;text-decoration:none;}
+.sb-link:hover{background:rgba(212,160,23,.08);color:var(--text);}
+.sb-link.active{background:rgba(212,160,23,.1);color:var(--gold-l);border-left:2px solid var(--gold);}
+.sb-link .sb-num{width:18px;height:18px;border-radius:5px;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0;}
+.sb-link.done .sb-num{background:rgba(34,197,94,.15);color:var(--green);}
+.progress-bar{margin:16px 20px 0;background:rgba(255,255,255,.06);border-radius:10px;height:4px;}
+.progress-fill{height:4px;background:linear-gradient(90deg,var(--gold),var(--gold-l));border-radius:10px;transition:width .4s ease;width:0%;}
+.progress-label{font-size:10px;color:var(--muted);margin-top:6px;padding:0 20px;}
+
+.content{margin-left:240px;padding:40px 48px 100px;position:relative;z-index:1;max-width:1000px;}
+
+/* HERO */
+.hero{text-align:center;padding:48px 0 56px;border-bottom:1px solid var(--border);margin-bottom:48px;}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(212,160,23,.08);border:1px solid rgba(212,160,23,.2);border-radius:20px;padding:6px 16px;font-size:11px;color:var(--gold);font-weight:600;margin-bottom:20px;letter-spacing:.04em;}
+.hero h1{font-family:'Syne',sans-serif;font-size:36px;font-weight:800;margin-bottom:12px;line-height:1.15;}
+.hero h1 em{color:var(--gold-l);font-style:normal;}
+.hero-sub{font-size:15px;color:var(--muted);max-width:560px;margin:0 auto 28px;}
+.hero-stack{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;}
+.stack-badge{background:rgba(255,255,255,.04);border:1px solid var(--border2);border-radius:8px;padding:6px 14px;font-size:11px;color:var(--muted);}
+.stack-badge.done{border-color:rgba(34,197,94,.25);color:var(--green);background:rgba(34,197,94,.06);}
+
+/* SECTIONS */
+.section{margin-bottom:64px;scroll-margin-top:32px;}
+.section-header{display:flex;align-items:center;gap:16px;margin-bottom:28px;}
+.section-num{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,var(--gold),var(--gold-l));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:#000;flex-shrink:0;}
+.section-num.done{background:linear-gradient(135deg,#16a34a,#22c55e);}
+.section-title{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;}
+.section-desc{font-size:13px;color:var(--muted);margin-top:3px;}
+.est-time{margin-left:auto;background:rgba(212,160,23,.08);border:1px solid rgba(212,160,23,.2);border-radius:20px;padding:4px 12px;font-size:10px;color:var(--gold);font-weight:700;white-space:nowrap;}
+
+/* STEPS */
+.steps{display:flex;flex-direction:column;gap:14px;}
+.step{background:var(--panel);border:1px solid var(--border);border-radius:14px;overflow:hidden;}
+.step-hdr{padding:14px 18px;display:flex;align-items:center;gap:12px;cursor:pointer;user-select:none;}
+.step-hdr:hover{background:rgba(255,255,255,.02);}
+.step-dot{width:26px;height:26px;border-radius:8px;background:rgba(212,160,23,.1);border:1px solid rgba(212,160,23,.25);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:var(--gold);flex-shrink:0;}
+.step-dot.done{background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.3);color:var(--green);}
+.step-name{font-weight:600;font-size:13px;}
+.step-tag{margin-left:auto;font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;}
+.step-chevron{font-size:10px;color:var(--muted);margin-left:8px;transition:transform .2s;}
+.step.open .step-chevron{transform:rotate(180deg);}
+.step-body{display:none;padding:0 18px 18px;}
+.step.open .step-body{display:block;}
+
+/* CONTENT BLOCKS */
+.info-box{background:rgba(96,165,250,.06);border:1px solid rgba(96,165,250,.2);border-radius:10px;padding:13px 16px;margin-bottom:14px;font-size:13px;color:var(--text);line-height:1.7;}
+.info-box .ib-label{font-size:10px;color:var(--blue);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;}
+.warn-box{background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.2);border-radius:10px;padding:13px 16px;margin-bottom:14px;font-size:13px;line-height:1.7;}
+.warn-box .ib-label{font-size:10px;color:var(--gold);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;}
+.success-box{background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.2);border-radius:10px;padding:13px 16px;margin-bottom:14px;font-size:13px;line-height:1.7;}
+.success-box .ib-label{font-size:10px;color:var(--green);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;}
+
+.instruction-list{display:flex;flex-direction:column;gap:10px;margin-bottom:14px;}
+.inst{display:flex;gap:11px;align-items:flex-start;}
+.inst-n{width:22px;height:22px;border-radius:6px;background:rgba(212,160,23,.12);border:1px solid rgba(212,160,23,.25);color:var(--gold);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px;}
+.inst-body{flex:1;font-size:13px;line-height:1.65;}
+.inst-body strong{color:var(--text);}
+code{background:rgba(212,160,23,.1);border:1px solid rgba(212,160,23,.2);border-radius:4px;padding:1px 7px;font-family:'DM Mono',monospace;font-size:11px;color:var(--gold);}
+.code-block{background:rgba(0,0,0,.5);border:1px solid var(--border2);border-radius:10px;padding:14px 16px;font-family:'DM Mono',monospace;font-size:12px;color:#a8d4f0;line-height:1.7;overflow-x:auto;white-space:pre;position:relative;margin-bottom:12px;}
+.code-block .cb-lang{position:absolute;top:8px;right:48px;font-size:9px;color:rgba(255,255,255,.2);text-transform:uppercase;letter-spacing:.06em;}
+.copy-btn{position:absolute;top:8px;right:8px;background:rgba(212,160,23,.1);border:1px solid rgba(212,160,23,.25);border-radius:6px;padding:3px 10px;color:var(--gold);font-size:9px;cursor:pointer;font-family:'DM Mono',monospace;transition:all .15s;}
+.copy-btn:hover{background:rgba(212,160,23,.2);}
+.copy-btn.copied{background:rgba(34,197,94,.1);border-color:rgba(34,197,94,.3);color:var(--green);}
+
+/* ENV FILE */
+.env-file{background:rgba(0,0,0,.6);border:1px solid rgba(212,160,23,.2);border-radius:12px;overflow:hidden;margin-bottom:14px;}
+.env-file-hdr{padding:10px 16px;background:rgba(212,160,23,.06);border-bottom:1px solid rgba(212,160,23,.12);display:flex;align-items:center;justify-content:space-between;}
+.env-file-name{font-family:'DM Mono',monospace;font-size:12px;color:var(--gold);}
+.env-body{padding:16px;font-family:'DM Mono',monospace;font-size:12px;line-height:2;color:#a8d4f0;}
+.env-comment{color:#4a6070;}
+.env-key{color:#f0c040;}
+.env-val{color:#a8d4f0;}
+.env-highlight{color:#86efac;}
+
+/* CHECKLIST */
+.checklist{display:flex;flex-direction:column;gap:7px;margin-bottom:14px;}
+.check-item{display:flex;align-items:center;gap:10px;padding:9px 13px;background:rgba(255,255,255,.03);border:1px solid var(--border2);border-radius:9px;cursor:pointer;transition:all .15s;}
+.check-item:hover{background:rgba(255,255,255,.05);}
+.check-item.checked{background:rgba(34,197,94,.05);border-color:rgba(34,197,94,.2);}
+.check-box{width:18px;height:18px;border-radius:5px;border:2px solid var(--muted);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;}
+.check-item.checked .check-box{background:var(--green);border-color:var(--green);}
+.check-box svg{display:none;width:10px;height:10px;fill:#fff;}
+.check-item.checked .check-box svg{display:block;}
+.check-label{font-size:13px;flex:1;}
+.check-item.checked .check-label{color:var(--muted);text-decoration:line-through;}
+
+/* FILE DIFF */
+.file-diff{background:rgba(0,0,0,.4);border:1px solid var(--border2);border-radius:10px;overflow:hidden;margin-bottom:12px;font-family:'DM Mono',monospace;font-size:12px;}
+.diff-hdr{padding:8px 14px;background:rgba(255,255,255,.03);border-bottom:1px solid var(--border2);font-size:11px;color:var(--muted);display:flex;justify-content:space-between;}
+.diff-body{padding:12px 14px;line-height:2;}
+.diff-add{color:#86efac;}.diff-rem{color:#fca5a5;text-decoration:line-through;opacity:.6;}.diff-ctx{color:#4a6070;}
+
+/* BOTTOM BAR */
+.bottom-bar{position:fixed;bottom:0;left:240px;right:0;z-index:50;background:rgba(5,11,20,.97);border-top:1px solid var(--border);padding:10px 28px;display:flex;align-items:center;gap:14px;}
+.btn-primary{background:linear-gradient(135deg,var(--gold),var(--gold-l));border:none;border-radius:9px;padding:9px 22px;color:#000;font-family:'Syne',sans-serif;font-size:12px;font-weight:800;cursor:pointer;letter-spacing:.04em;transition:all .2s;}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(212,160,23,.3);}
+.btn-sec{background:rgba(255,255,255,.05);border:1px solid var(--border2);border-radius:9px;padding:9px 18px;color:var(--muted);font-size:12px;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif;}
+.btn-sec:hover{color:var(--text);background:rgba(255,255,255,.08);}
+.progress-overall{flex:1;background:rgba(255,255,255,.06);border-radius:10px;height:6px;}
+.progress-overall-fill{height:6px;background:linear-gradient(90deg,var(--gold),var(--gold-l));border-radius:10px;transition:width .4s ease;width:0%;}
+.progress-pct{font-family:'DM Mono',monospace;font-size:11px;color:var(--gold);}
+
+@media(max-width:768px){.sidebar{display:none}.content{margin-left:0;padding:24px 20px 80px}.bottom-bar{left:0}}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sb-brand">
+    <div class="sb-kj">KJ</div>
+    <div class="sb-title">Go Live Guide</div>
+    <div class="sb-sub">3 tasks · ~2 hours total</div>
+  </div>
+
+  <div class="progress-bar"><div class="progress-fill" id="sbProgress"></div></div>
+  <div class="progress-label" id="sbProgressLabel">0 of 18 steps complete</div>
+
+  <div style="margin-top:16px">
+    <div class="sb-section">
+      <div class="sb-section-label">Step 1 — API Keys (~45 min)</div>
+      <a class="sb-link" href="#anthropic" onclick="scrollTo('anthropic')"><div class="sb-num">A</div>Anthropic (Claude)</a>
+      <a class="sb-link" href="#meta" onclick="scrollTo('meta')"><div class="sb-num">B</div>Meta WhatsApp</a>
+      <a class="sb-link" href="#daraja" onclick="scrollTo('daraja')"><div class="sb-num">C</div>M-Pesa Daraja</a>
+      <a class="sb-link" href="#google" onclick="scrollTo('google')"><div class="sb-num">D</div>Google Sheets</a>
+    </div>
+    <div class="sb-section">
+      <div class="sb-section-label">Step 2 — Website (~20 min)</div>
+      <a class="sb-link" href="#widget1" onclick="scrollTo('widget1')"><div class="sb-num">1</div>WhatsApp Button</a>
+      <a class="sb-link" href="#widget2" onclick="scrollTo('widget2')"><div class="sb-num">2</div>Quote Form</a>
+      <a class="sb-link" href="#widget3" onclick="scrollTo('widget3')"><div class="sb-num">3</div>AI Chat Agent</a>
+    </div>
+    <div class="sb-section">
+      <div class="sb-section-label">Step 3 — Deploy (~55 min)</div>
+      <a class="sb-link" href="#railway" onclick="scrollTo('railway')"><div class="sb-num">R</div>Railway Setup</a>
+      <a class="sb-link" href="#envvars" onclick="scrollTo('envvars')"><div class="sb-num">E</div>Environment Vars</a>
+      <a class="sb-link" href="#webhook" onclick="scrollTo('webhook')"><div class="sb-num">W</div>Meta Webhook</a>
+      <a class="sb-link" href="#test" onclick="scrollTo('test')"><div class="sb-num">✓</div>Final Testing</a>
+    </div>
+  </div>
+</nav>
+
+<!-- CONTENT -->
+<div class="content">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-badge">🚀 KJ Land Surveyors AI System · Go Live Guide</div>
+    <h1>From Built to <em>Live</em><br>in Under 2 Hours</h1>
+    <div class="hero-sub">Follow these steps in order. Everything you need — API keys, website widgets, and server deployment — is in this guide.</div>
+    <div class="hero-stack">
+      <div class="stack-badge done">✅ Phase 1 — 13 Agents</div>
+      <div class="stack-badge done">✅ Phase 2 — WhatsApp</div>
+      <div class="stack-badge done">✅ Phase 3 — Sheets + M-Pesa</div>
+      <div class="stack-badge done">✅ Phase 4 — PDF + Orchestration</div>
+      <div class="stack-badge">⏳ Deploy to Railway</div>
+      <div class="stack-badge">⏳ API Keys</div>
+      <div class="stack-badge">⏳ Website Widgets</div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       STEP 1 — API KEYS
+  ══════════════════════════════ -->
+  <div class="section" id="step1">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <div>
+        <div class="section-title">Get Your API Keys</div>
+        <div class="section-desc">4 services · all free to start · takes ~45 minutes</div>
+      </div>
+      <div class="est-time">⏱ ~45 min</div>
+    </div>
+
+    <!-- ANTHROPIC -->
+    <div class="steps">
+      <div class="step open" id="anthropic">
+        <div class="step-hdr" onclick="toggleStep(this)">
+          <div class="step-dot">A</div>
+          <div class="step-name">Anthropic API Key — powers all AI agents</div>
+          <div class="step-tag">console.anthropic.com</div>
+          <div class="step-chevron">▼</div>
+        </div>
+        <div class="step-body">
+          <div class="info-box"><div class="ib-label">💡 What this does</div>This key lets all your AI agents (Reception, Quotation, Master Agent, etc.) run on Claude. Every WhatsApp reply, PDF quote, and orchestration call uses this key.</div>
+          <div class="instruction-list">
+            <div class="inst"><div class="inst-n">1</div><div class="inst-body">Go to <strong>console.anthropic.com</strong> → sign in or create a free account</div></div>
+            <div class="inst"><div class="inst-n">2</div><div class="inst-body">Click <strong>API Keys</strong> in the left sidebar → <strong>Create Key</strong></div></div>
+            <div class="inst"><div class="inst-n">3</div><div class="inst-body">Name it <code>kj-land-surveyors</code> → click <strong>Create Key</strong></div></div>
+            <div class="inst"><div class="inst-n">4</div><div class="inst-body">Copy the key — it starts with <code>sk-ant-</code>. <strong>Save it now</strong> — you won't see it again.</div></div>
+            <div class="inst"><div class="inst-n">5</div><div class="inst-body">Go to <strong>Billing</strong> → add a credit card. New accounts get $5 free credit. Usage for KJ will be roughly <strong>$5–15/month</strong> depending on volume.</div></div>
+          </div>
+          <div class="env-file">
+            <div class="env-file-hdr"><span class="env-file-name">.env — paste your key here</span><button class="copy-btn" onclick="copyEnv('e-anthropic',this)">📋 Copy</button></div>
+            <div class="env-body" id="e-anthropic"><span class="env-comment"># Anthropic Claude API</span>
+<span class="env-key">ANTHROPIC_API_KEY</span>=<span class="env-highlight">sk-ant-api03-PASTE-YOUR-KEY-HERE</span></div>
+          </div>
+          <div class="checklist">
+            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"><svg viewBox="0 0 12 10"><polyline points="1,5 4,8 11,1" stroke="#fff" stroke-width="2" fill="none"/></svg></div><div class="check-label">Account created at console.anthropic.com</div></div>
+            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"><svg viewBox="0 0 12 10"><polyline points="1,5 4,8 11,1" stroke="#fff" stroke-width="2" fill="none"/></svg></div><div class="check-label">API key copied and saved safely</div></div>
+            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"><svg viewBox="0 0 12 10"><polyline points="1,5 4,8 11,1" stroke="#fff" stroke-width="2" fill="none"/></svg></div><div class="check-label">Billing card added</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- META -->
+      <div class="step" id="meta">
+        <div class="step-hdr" onclick="toggleStep(this)">
+          <div class="step-dot">B</div>
+          <div class="step-name">Meta WhatsApp Business API — auto-reply to clients</div>
+          <div class="step-tag">developers.facebook.com</div>
+          <div class="step-chevron">▼</div>
+        </div>
+        <div class="step-body">
+          <div class="info-box"><div class="ib-label">💡 What this does</div>When a client WhatsApps KJ's number, Meta sends the message to your server, Claude replies, and the reply goes back through Meta to the client. You need 3 values: Access Token, Phone Number ID, and Verify Token.</div>
+          <div class="warn-box"><div class="ib-label">⚠️ Requirement</div>You need a <strong>Facebook Business account</strong> and a <strong>phone number not already on WhatsApp</strong> (can be a new SIM or virtual number). Your existing personal WhatsApp number cannot be used.</div>
+          <div class="instruction-list">
+            <div class="inst"><div class="inst-n">1</div><div class="inst-body">Go to <strong>developers.facebook.com</strong> → <strong>My Apps</strong> → <strong>Create App</strong></div></div>
+            <div class="inst"><div class="inst-n">2</div><div class="inst-body">Select <strong>Business</strong> as app type → name it <code>KJ Land Surveyors</code> → Create</div></div>
+            <div class="inst"><div class="inst-n">3</div><div class="inst-body">On your app dashboard → <strong>Add Product</strong> → find <strong>WhatsApp</strong> → click <strong>Set Up</strong></div></div>
+            <div class="inst"><div class="inst-n">4</div><div class="inst-body">Go to <strong>WhatsApp → API Setup</strong>. You'll see a test phone number already set up. Copy the <strong>Phone Number ID</strong> shown on screen.</div></div>
+            <div class="inst"><div class="inst-n">5</div><div class="inst-body">Click <strong>Generate Access Token</strong> → copy it. Note: this temporary token expires in 24 hours. After deployment, generate a <strong>permanent token</strong> via System Users (see note below).</div></div>
+            <div class="inst"><div class="inst-n">6</div><div class="inst-body">Make up any string for your <strong>Verify Token</strong> — e.g. <code>kjlandsurveyors2026</code>. You'll paste this same string in Meta's webhook config later.</div></div>
+          </div>
+          <div class="info-box"><div class="ib-label">🔑 Permanent Access Token (do this after deployment)</div>Meta Business Suite → Settings → System Users → Add → Admin role → Generate Token → select your app → grant <code>whatsapp_business_messaging</code> permission → copy the token. This never expires.</div>
+          <div class="env-file">
+            <div class="env-file-hdr"><span class="env-file-name">.env — paste your values</span><button class="copy-btn" onclick="copyEnv('e-meta',this)">📋 Copy</button></div>
+            <div class="env-body" id="e-meta"><span class="env-comment"># Meta WhatsApp Business API</span>
+<span class="env-key">WHATSAPP_TOKEN</span>=<span class="env-highlight">EAAxxxxxxxxxxxxxxxxx</span>
+<span class="env-key">WHATSAPP_PHONE_ID</span>=<span class="env-highlight">1234567890123456</span>
+<span class="env-key">WHATSAPP_VERIFY_TOKEN</span>=<span class="env-highlight">kjlandsurveyors2026</span>
+<span class="env-key">DIRECTOR_PHONE</span>=<span class="env-highlight">254720397313</span></div>
+          </div>
+          <div class="checklist">
+            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"><svg viewBox="0 0 12 10"><polyline points="1,5 4,8 11,1" stroke="#fff" stroke-width="2" fill="none"/></svg></div><div class="check-label">Facebook App created with WhatsApp product added</div></div>
+            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"><svg viewBox="0 0 12 10"><polyline points="1,5 4,8 11,1" stroke="#fff" stroke-width="2" fill="none"/></svg></div><div class="check-label">Phone Number ID copied</div></div>
+            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"><svg viewBox="0 0 12 10"><polyline points="1,5 4,8 11,1" stroke="#fff" stroke-width="2" fill="none"/></svg></div><div class="check-label">Access Token copied</div></div>
+            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"><svg viewBox="0 0 12 10"><polyline points="1,5 4,8 11,1" stroke="#fff" stroke-width="2" fill="none"/></svg></div><div class="check-label">Verify Token decided (e.g. kjlandsurveyors2026)</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DARAJA -->
+      <div class="step" id="daraja">
+        <div class="step-hdr" onclick="toggleStep(this)">
+          <div class="step-dot">C</div>
+          <div class="step-name">M-Pesa Daraja API — STK Push payments</div>
+          <div class="step-tag">developer.safaricom.co.ke</div>
+          <div class="step-chevron">▼</div>
+        </div>
+        <div class="step-body">
+          <div class="info-box"><div class="ib-label">💡 What this does</div>Lets you send an M-Pesa payment prompt directly to a client's phone. They approve with their PIN, money goes to KJ's till, and the receipt is auto-logged to Google Sheets.</div>
+          <div class="success-box"><div class="ib-label">✅ Sandbox is instant — no waiting</div>You can start testing payments today using the sandbox. Production (real money) requires Safaricom to approve your Paybill/Till, which takes 2–5 business days.</div>
+          <div class="instruction-list">
+            <div class="inst"><div class="inst-n">1</div><div class="inst-body">Go to <strong>developer.safaricom.co.ke</strong> → <strong>Sign Up</strong> with your business email</div></div>
+            <div class="inst"><div class="inst-n">2</div><div class="inst-body">Verify your email → Log in → click <strong>My Apps</strong> → <strong>Add New App</strong></div></div>
+            <div class="inst"><div class="inst-n">3</div><div class="inst-body">Name: <code>KJ Land Surveyors</code> → select APIs: tick <strong>Lipa Na M-Pesa Online (STK Push)</strong> and <strong>M-Pesa Express</strong> → Create App</div></div>
+            <div class="inst"><div class="inst-n">4</div><div class="inst-body">Open your new app → copy <strong>Consumer Key</strong> and <strong>Consumer Secret</strong></div></div>
+            <div class="inst"><div class="inst-n">5</div><div class="inst-body">For the sandbox <strong>Passkey</strong>, use: <code>bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919</code> (Safaricom's public sandbox passkey)</div></div>
+            <div class="inst"><div class="inst-n">6</div><div class="inst-body">Sandbox <strong>Shortcode</strong>: use <code>174379</code>. For production, use your actual Paybill or Till number.</div></div>
+            <div class="inst"><div class="inst-n">7</div><div class="inst-body"><strong>Production application:</strong> On the portal → <strong>Go Live</strong> → fill in Certificate of Incorporation/Business Permit, KRA PIN, Paybill number → submit. Safaricom reviews in 2–5 days.</div></div>
+          </div>
+          <div class="env-file">
+            <div class="env-file-hdr"><span class="env-file-name">.env — paste your values</span><button class="copy-btn" onclick="copyEnv('e-daraja',this)">📋 Copy</button></div>
+            <div class="env-body" id="e-daraja"><span class="env-comment"># M-Pesa Daraja (use sandbox values to start)</span>
+<span class="env-key">MPESA_CONSUMER_KEY</span>=<span class="env-highlight">PASTE_FROM_DARAJA_PORTAL</span>
+<span class="env-key">MPESA_CONSUMER_SECRET</span>=<span class="env-highlight">PASTE_FROM_DARAJA_PORTAL</span>
+<span class="env-key">MPESA_SHORTCODE</span>=<span class="env-highlight">174379</span>
+<span class="env-key">MPESA_PASSKEY</span>=<span class="env-highlight">bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919</span>
+<span class="env-key">MPESA_ENVIRONMENT</span>=<span class="env-highlight">sandbox</span>
+<span class="env-key">MPESA_CALLBACK_URL</span>=<span class="env-highlight">https://YOUR-RAILWAY-URL.railway.app/mpesa/callback</span></div>
+          </div>
+          <div class="checklist">
+            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"><svg viewBox="0 0 12 10"><polyline points="1,5 4,8 11,1" stroke="#fff" stroke-width="2" fill="none"/></svg></div><div class="check-label">Daraja account created</div></div>
+            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"><svg viewBox="0 0 12 10"><polyline points="1,5 4,8 11,1" stroke="#fff" stroke-width="2" fill="none"/></svg></div><div class="check-label">App created with STK Push APIs selected</div></div>
+            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"><svg viewBox="0 0 12 10"><polyline points="1,5 4,8 11,1" stroke="#fff" stroke-width="2" fill="none"/></svg></div><div class="check-label">Consumer Key + Secret copied</div></div>
+            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"><svg viewBox="0 0 12 10"><polyline points="1,5 4,8 11,1" stroke="#fff" stroke-width="2" fill="none"/></svg></div><div class="check-label">Production Go Live application submitted (can do later)</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GOOGLE -->
+      <div class="step" id="google">
+        <div class="step-hdr" onclick="toggleStep(this)">
+          <div class="step-dot">D</div>
+          <div class="step-name">Google Sheets API — auto-sync operations data</div>
+          <div class="step-tag">console.cloud.google.com</div>
+          <div class="step-chevron">▼</div>
+        </div>
+        <div class="step-body">
+          <div class="info-box"><div class="ib-label">💡 What this does</div>Every new client, project, payment, and daily summary auto-writes a row to your Google Spreadsheet in real time. No manual data entry ever again.</div>
+          <div class="instruction-list">
+            <div class="inst"><div class="inst-n">1</div><div class="inst-body">Go to <strong>console.cloud.google.com</strong> → click <strong>Select a Project</strong> → <strong>New Project</strong> → name: <code>KJ-LandSurveyors</code> → Create</div></div>
+            <div class="inst"><div class="inst-n">2</div><div class="inst-body"><strong>APIs & Services → Library</strong> → search <code>Google Sheets API</code> → click it → <strong>Enable</strong></div></div>
+            <div class="inst"><div class="inst-n">3</div><div class="inst-body"><strong>APIs & Services → Credentials → Create Credentials → Service Account</strong> → name: <code>kj-sheets-agent</code> → Role: <strong>Editor</strong> → Done</div></div>
+            <div class="inst"><div class="inst-n">4</div><div class="inst-body">Click your new service account → <strong>Keys tab → Add Key → JSON</strong> → Download. Open the file and find <code>client_email</code> and <code>private_key</code>.</div></div>
+            <div class="inst"><div class="inst-n">5</div><div class="inst-body">Go to <strong>sheets.google.com</strong> → create a new spreadsheet → name it <code>KJ Land Surveyors Operations</code>. Copy the long ID from the URL (the part between <code>/d/</code> and <code>/edit</code>).</div></div>
+            <div class="inst"><div class="inst-n">6</div><div class="inst-body">In the spreadsheet → <strong>Share</strong> → paste your <code>client_email</code> from the JSON → set role to <strong>Editor</strong> → Send. This lets your server write to it.</div></div>
+          </div>
+          <div class="warn-box"><div class="ib-label">⚠️ Private Key Formatting</div>When pasting into .env, the private key must have <code>\n</code> replacing actual newlines, and must be wrapped in double quotes. The format is shown below.</div>
+          <div class="env-file">
+            <div class="env-file-hdr"><span class="env-file-name">.env — paste your values</span><button class="copy-btn" onclick="copyEnv('e-google',this)">📋 Copy</button></div>
+            <div class="env-body" id="e-google"><span class="env-comment"># Google Sheets Service Account</span>
+<span class="env-key">GOOGLE_SERVICE_ACCOUNT_EMAIL</span>=<span class="env-highlight">kj-sheets-agent@kj-landsurveyors.iam.gserviceaccount.com</span>
+<span class="env-key">GOOGLE_PRIVATE_KEY</span>=<span class="env-highlight">"-----BEGIN RSA PRIVATE KEY-----\nMIIEpAIBAAKCAQEA...\n-----END RSA PRIVATE KEY-----"</span>
+<span class="env-key">GOOGLE_SPREADSHEET_ID</span>=<span class="env-highlight">1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgVE2upms</span></div>
+          </div>
+          <div class="checklist">
+            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"><svg viewBox="0 0 12 10"><polyline points="1,5 4,8 11,1" stroke="#fff" stroke-width="2" fill="none"/></svg></div><div class="check-label">Google Cloud project created</div></div>
+            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"><svg viewBox="0 0 12 10"><polyline points="1,5 4,8 11,1" stroke="#fff" stroke-width="2" fill="none"/></svg></div><div class="check-label">Sheets API enabled</div></div>
+            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"><svg viewBox="0 0 12 10"><polyline points="1,5 4,8 11,1" stroke="#fff" stroke-width="2" fill="none"/></svg></div><div class="check-label">Service account JSON downloaded</div></div>
+            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"><svg viewBox="0 0 12 10"><polyline points="1,5 4,8 11,1" stroke="#fff" stroke-width="2" fill="none"/></svg></div><div class="check-label">Spreadsheet created and shared with service account email</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       STEP 2 — WEBSITE WIDGETS
+  ══════════════════════════════ -->
+  <div class="section" id="step2">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <div>
+        <div class="section-title">Add Widgets to Your Website</div>
+        <div class="section-desc">samcybernetix.github.io/fictional-carnival · edit HTML directly</div>
+      </div>
+      <div class="est-time">⏱ ~20 min</div>
+    </div>
+
+    <div class="info-box"><div class="ib-label">📁 How GitHub Pages works</div>Your site files live in a GitHub repository. To edit: go to <strong>github.com → your repo → find your HTML file → click the pencil (edit) icon</strong>. Make your changes, then click <strong>Commit changes</strong>. The site updates in ~60 seconds.</div>
+
+    <div class="steps">
+      <div class="step" id="widget1">
+        <div class="step-hdr" onclick="toggleStep(this)">
+          <div class="step-dot">1</div>
+          <div class="step-name">WhatsApp Floating Button</div>
+          <div class="step-tag">paste before &lt;/body&gt;</div>
+          <div class="step-chevron">▼</div>
+        </div>
+        <div class="step-body">
+          <div class="instruction-list">
+            <div class="inst"><div class="inst-n">1</div><div class="inst-body">Open your repo on GitHub → open your main <code>index.html</code> file → click the pencil icon to edit</div></div>
+            <div class="inst"><div class="inst-n">2</div><div class="inst-body">Press <code>Ctrl+F</code> (or <code>Cmd+F</code>) → search for <code>&lt;/body&gt;</code> → you'll find it near the very bottom</div></div>
+            <div class="inst"><div class="inst-n">3</div><div class="inst-body">Click just before <code>&lt;/body&gt;</code> → paste the Widget 1 code from your <code>kj-website-widgets.html</code> file</div></div>
+            <div class="inst"><div class="inst-n">4</div><div class="inst-body">Scroll to bottom → click <strong>Commit changes</strong> → wait 60 seconds → check your live site</div></div>
+          </div>
+          <div class="file-diff">
+            <div class="diff-hdr"><span>index.html — where to paste</span></div>
+            <div class="diff-body">
+<span class="diff-ctx">  &lt;footer&gt;...&lt;/footer&gt;</span>
+<span class="diff-ctx"></span>
+<span class="diff-add">  &lt;!-- KJ WhatsApp Widget — paste Widget 1 code here --&gt;</span>
+<span class="diff-add">  &lt;div class="kj-wa-fab" onclick="..."&gt;...&lt;/div&gt;</span>
+<span class="diff-ctx"></span>
+<span class="diff-ctx">&lt;/body&gt;</span>
+<span class="diff-ctx">&lt;/html&gt;</span>
+            </div>
+          </div>
+          <div class="checklist">
+            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"><svg viewBox="0 0 12 10"><polyline points="1,5 4,8 11,1" stroke="#fff" stroke-width="2" fill="none"/></svg></div><div class="check-label">Widget 1 code pasted before &lt;/body&gt;</div></div>
+            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"><svg viewBox="0 0 12 10"><polyline points="1,5 4,8 11,1" stroke="#fff" stroke-width="2" fill="none"/></svg></div><div class="check-label">Changes committed to GitHub</div></div>
+            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"><svg viewBox="0 0 12 10"><polyline points="1,5 4,8 11,1" stroke="#fff" stroke-width="2" fill="none"/></svg></div><div class="check-label">WhatsApp button visible on live site (bottom-right)</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="step" id="widget2">
+        <div class="step-hdr" onclick="toggleStep(this)">
+          <div class="step-dot">2</div>
+          <div class="step-name">Quote Request Form</div>
+          <div class="step-tag">replaces existing contact form</div>
+          <div class="step-chevron">▼</div>
+        </div>
+        <div class="step-body">
+          <div class="instruction-list">
+            <div class="inst"><div class="inst-n">1</div><div class="inst-body">In your <code>index.html</code> → search for <code>&lt;form</code> to find your existing enquiry form</div></div>
+            <div class="inst"><div class="inst-n">2</div><div class="inst-body">Select from the opening <code>&lt;form</code> tag all the way to the closing <code>&lt;/form&gt;</code> tag — delete it all</div></div>
+            <div class="inst"><div class="inst-n">3</div><div class="inst-body">Paste the Widget 2 code from <code>kj-website-widgets.html</code> in its place</div></div>
+            <div class="inst"><div class="inst-n">4</div><div class="inst-body">After deploying your server (Step 3), come back and uncomment <strong>Option A</strong> in the form's JavaScript and paste your Railway server URL</div></div>
+          </div>
+          <div class="success-box"><div class="ib-label">✅ Works immediately without a server</div>Option B (WhatsApp pre-fill) is active by default. When a client submits the form, it opens WhatsApp with their details pre-filled. After deploying your server, switch to Option A to auto-save to your database.</div>
+          <div class="checklist">
+            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"><svg viewBox="0 0 12 10"><polyline points="1,5 4,8 11,1" stroke="#fff" stroke-width="2" fill="none"/></svg></div><div class="check-label">Existing form replaced with Widget 2 code</div></div>
+            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"><svg viewBox="0 0 12 10"><polyline points="1,5 4,8 11,1" stroke="#fff" stroke-width="2" fill="none"/></svg></div><div class="check-label">Form submits successfully (test it)</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="step" id="widget3">
+        <div class="step-hdr" onclick="toggleStep(this)">
+          <div class="step-dot">3</div>
+          <div class="step-name">AI Chat Agent</div>
+          <div class="step-tag">paste before &lt;/body&gt; · needs API key</div>
+          <div class="step-chevron">▼</div>
+        </div>
+        <div class="step-body">
+          <div class="warn-box"><div class="ib-label">⚠️ API Key Visibility</div>Your site is on GitHub Pages (static hosting). The Anthropic API key in Widget 3 will be visible in your page's source code. For public sites, route the AI calls through your Phase 4 server instead — this keeps the key hidden. Instructions below.</div>
+          <div class="instruction-list">
+            <div class="inst"><div class="inst-n">1</div><div class="inst-body">Open Widget 3 code from <code>kj-website-widgets.html</code></div></div>
+            <div class="inst"><div class="inst-n">2</div><div class="inst-body">Find the line: <code>const KJ_API_KEY = 'YOUR_ANTHROPIC_API_KEY_HERE';</code> → replace with your actual key</div></div>
+            <div class="inst"><div class="inst-n">3</div><div class="inst-body">Paste the entire Widget 3 block before <code>&lt;/body&gt;</code> — after Widget 1</div></div>
+            <div class="inst"><div class="inst-n">4</div><div class="inst-body"><strong>Move Widget 1 right:</strong> In Widget 1's CSS, change <code>right: 28px</code> to <code>right: 104px</code> so the WhatsApp button doesn't overlap the chat button</div></div>
+          </div>
+          <div class="file-diff">
+            <div class="diff-hdr"><span>Widget 1 CSS — move WhatsApp button right</span></div>
+            <div class="diff-body">
+<span class="diff-ctx">.kj-wa-fab {</span>
+<span class="diff-ctx">  position: fixed;</span>
+<span class="diff-ctx">  bottom: 28px;</span>
+<span class="diff-rem">  right: 28px;   ← change this</span>
+<span class="diff-add">  right: 104px;  ← to this</span>
+<span class="diff-ctx">  z-index: 9999;</span>
+            </div>
+          </div>
+          <div class="checklist">
+            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"><svg viewBox="0 0 12 10"><polyline points="1,5 4,8 11,1" stroke="#fff" stroke-width="2" fill="none"/></svg></div><div class="check-label">Anthropic API key replaced in Widget 3 code</div></div>
+            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"><svg viewBox="0 0 12 10"><polyline points="1,5 4,8 11,1" stroke="#fff" stroke-width="2" fill="none"/></svg></div><div class="check-label">Widget 1 right position updated to 104px</div></div>
+            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"><svg viewBox="0 0 12 10"><polyline points="1,5 4,8 11,1" stroke="#fff" stroke-width="2" fill="none"/></svg></div><div class="check-label">AI chat button visible bottom-right, WhatsApp beside it</div></div>
+            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"><svg viewBox="0 0 12 10"><polyline points="1,5 4,8 11,1" stroke="#fff" stroke-width="2" fill="none"/></svg></div><div class="check-label">Chat opens and AI responds to a test message</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       STEP 3 — RAILWAY DEPLOY
+  ══════════════════════════════ -->
+  <div class="section" id="step3">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <div>
+        <div class="section-title">Deploy to Railway</div>
+        <div class="section-desc">Free tier · always-on · HTTPS included · takes ~55 minutes</div>
+      </div>
+      <div class="est-time">⏱ ~55 min</div>
+    </div>
+
+    <div class="info-box"><div class="ib-label">💡 Why Railway?</div>Railway gives you a public HTTPS URL (required by Meta for webhooks), free tier with 500 hours/month, automatic deploys from GitHub, and built-in environment variable management. No server knowledge needed.</div>
+
+    <div class="steps">
+      <div class="step" id="railway">
+        <div class="step-hdr" onclick="toggleStep(this)">
+          <div class="step-dot">R</div>
+          <div class="step-name">Create Railway Project & Deploy</div>
+          <div class="step-tag">railway.app</div>
+          <div class="step-chevron">▼</div>
+        </div>
+        <div class="step-body">
+          <div class="instruction-list">
+            <div class="inst"><div class="inst-n">1</div><div class="inst-body">Go to <strong>railway.app</strong> → <strong>Start a New Project</strong> → sign in with GitHub</div></div>
+            <div class="inst"><div class="inst-n">2</div><div class="inst-body">Create a new GitHub repository called <code>kj-ai-server</code> (private is fine)</div></div>
+            <div class="inst"><div class="inst-n">3</div><div class="inst-body">Upload your server files to the repo: <code>server.js</code>, <code>generate_quote.py</code>, <code>package.json</code></div></div>
+            <div class="inst"><div class="inst-n">4</div><div class="inst-body">On Railway → <strong>New Project → Deploy from GitHub repo</strong> → select <code>kj-ai-server</code></div></div>
+            <div class="inst"><div class="inst-n">5</div><div class="inst-body">Railway detects Node.js automatically and starts deploying. Wait ~2 minutes.</div></div>
+            <div class="inst"><div class="inst-n">6</div><div class="inst-body">Go to <strong>Settings → Networking → Generate Domain</strong>. You'll get a URL like <code>kj-ai-server-production.up.railway.app</code>. Copy this — you need it for the next steps.</div></div>
+            <div class="inst"><div class="inst-n">7</div><div class="inst-body">Add a <code>Procfile</code> to your repo with content: <code>web: node server.js</code> if Railway doesn't auto-detect your start command.</div></div>
+          </div>
+          <div class="code-block"><span class="cb-lang">bash</span><button class="copy-btn" onclick="copyBlock(this)">📋 Copy</button># Option: deploy via Railway CLI instead
+npm install -g @railway/cli
+railway login
+railway init          # in your project folder
+railway up            # deploys immediately
+railway open          # opens your live URL</div>
+          <div class="checklist">
+            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"><svg viewBox="0 0 12 10"><polyline points="1,5 4,8 11,1" stroke="#fff" stroke-width="2" fill="none"/></svg></div><div class="check-label">GitHub repo created with server files</div></div>
+            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"><svg viewBox="0 0 12 10"><polyline points="1,5 4,8 11,1" stroke="#fff" stroke-width="2" fill="none"/></svg></div><div class="check-label">Railway project created and linked to repo</div></div>
+            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"><svg viewBox="0 0 12 10"><polyline points="1,5 4,8 11,1" stroke="#fff" stroke-width="2" fill="none"/></svg></div><div class="check-label">Railway domain generated — URL copied</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="step" id="envvars">
+        <div class="step-hdr" onclick="toggleStep(this)">
+          <div class="step-dot">E</div>
+          <div class="step-name">Add Environment Variables to Railway</div>
+          <div class="step-tag">never commit .env to GitHub</div>
+          <div class="step-chevron">▼</div>
+        </div>
+        <div class="step-body">
+          <div class="warn-box"><div class="ib-label">⚠️ Never put .env in GitHub</div>Your API keys must go into Railway's dashboard, not into your code repository. If they're ever committed to GitHub, rotate them immediately.</div>
+          <div class="instruction-list">
+            <div class="inst"><div class="inst-n">1</div><div class="inst-body">On Railway → click your project → click the <strong>Variables</strong> tab</div></div>
+            <div class="inst"><div class="inst-n">2</div><div class="inst-body">Click <strong>RAW Editor</strong> → paste all your environment variables at once</div></div>
+            <div class="inst"><div class="inst-n">3</div><div class="inst-body">Click <strong>Update Variables</strong> → Railway redeploys automatically</div></div>
+          </div>
+          <div class="env-file">
+            <div class="env-file-hdr"><span class="env-file-name">Railway Variables — paste all at once</span><button class="copy-btn" onclick="copyEnv('e-all',this)">📋 Copy All</button></div>
+            <div class="env-body" id="e-all"><span class="env-comment"># ── Anthropic ────────────────────────</span>
+<span class="env-key">ANTHROPIC_API_KEY</span>=<span class="env-highlight">sk-ant-PASTE-HERE</span>
+
+<span class="env-comment"># ── WhatsApp ──────────────────────────</span>
+<span class="env-key">WHATSAPP_TOKEN</span>=<span class="env-highlight">EAAxxxx</span>
+<span class="env-key">WHATSAPP_PHONE_ID</span>=<span class="env-highlight">123456789</span>
+<span class="env-key">WHATSAPP_VERIFY_TOKEN</span>=<span class="env-highlight">kjlandsurveyors2026</span>
+<span class="env-key">DIRECTOR_PHONE</span>=<span class="env-highlight">254720397313</span>
+
+<span class="env-comment"># ── Google Sheets ─────────────────────</span>
+<span class="env-key">GOOGLE_SERVICE_ACCOUNT_EMAIL</span>=<span class="env-highlight">kj-sheets-agent@...iam.gserviceaccount.com</span>
+<span class="env-key">GOOGLE_PRIVATE_KEY</span>=<span class="env-highlight">"-----BEGIN RSA PRIVATE KEY-----\n...\n-----END RSA PRIVATE KEY-----"</span>
+<span class="env-key">GOOGLE_SPREADSHEET_ID</span>=<span class="env-highlight">1BxiMVs0XRA5nFMdKvBdBZjgm...</span>
+
+<span class="env-comment"># ── M-Pesa Daraja ─────────────────────</span>
+<span class="env-key">MPESA_CONSUMER_KEY</span>=<span class="env-highlight">PASTE-HERE</span>
+<span class="env-key">MPESA_CONSUMER_SECRET</span>=<span class="env-highlight">PASTE-HERE</span>
+<span class="env-key">MPESA_SHORTCODE</span>=<span class="env-highlight">174379</span>
+<span class="env-key">MPESA_PASSKEY</span>=<span class="env-highlight">bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919</span>
+<span class="env-key">MPESA_ENVIRONMENT</span>=<span class="env-highlight">sandbox</span>
+<span class="env-key">MPESA_CALLBACK_URL</span>=<span class="env-highlight">https://YOUR-URL.railway.app/mpesa/callback</span>
+
+<span class="env-comment"># ── Server ────────────────────────────</span>
+<span class="env-key">PORT</span>=<span class="env-highlight">3000</span></div>
+          </div>
+          <div class="checklist">
+            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"><svg viewBox="0 0 12 10"><polyline points="1,5 4,8 11,1" stroke="#fff" stroke-width="2" fill="none"/></svg></div><div class="check-label">All variables pasted into Railway Variables tab</div></div>
+            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"><svg viewBox="0 0 12 10"><polyline points="1,5 4,8 11,1" stroke="#fff" stroke-width="2" fill="none"/></svg></div><div class="check-label">Railway redeployed after saving variables</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="step" id="webhook">
+        <div class="step-hdr" onclick="toggleStep(this)">
+          <div class="step-dot">W</div>
+          <div class="step-name">Connect Meta Webhook</div>
+          <div class="step-tag">final link between WhatsApp and your server</div>
+          <div class="step-chevron">▼</div>
+        </div>
+        <div class="step-body">
+          <div class="instruction-list">
+            <div class="inst"><div class="inst-n">1</div><div class="inst-body">Go to <strong>developers.facebook.com → Your App → WhatsApp → Configuration</strong></div></div>
+            <div class="inst"><div class="inst-n">2</div><div class="inst-body">Under <strong>Webhook</strong> → click <strong>Edit</strong> → paste your Railway URL + <code>/webhook</code></div></div>
+            <div class="inst"><div class="inst-n">3</div><div class="inst-body"><strong>Verify Token:</strong> type <code>kjlandsurveyors2026</code> (must match your env variable exactly)</div></div>
+            <div class="inst"><div class="inst-n">4</div><div class="inst-body">Click <strong>Verify and Save</strong> — Meta sends a test request and your server responds. If it passes, you'll see a green tick.</div></div>
+            <div class="inst"><div class="inst-n">5</div><div class="inst-body">Under <strong>Webhook Fields</strong> → click <strong>Subscribe</strong> next to <code>messages</code></div></div>
+            <div class="inst"><div class="inst-n">6</div><div class="inst-body">Send a WhatsApp message to your test number → watch your Railway logs for the incoming message</div></div>
+          </div>
+          <div class="env-file">
+            <div class="env-file-hdr"><span class="env-file-name">Your webhook URL</span></div>
+            <div class="env-body">https://<span class="env-highlight">YOUR-PROJECT</span>.railway.app/webhook</div>
+          </div>
+          <div class="checklist">
+            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"><svg viewBox="0 0 12 10"><polyline points="1,5 4,8 11,1" stroke="#fff" stroke-width="2" fill="none"/></svg></div><div class="check-label">Webhook URL pasted in Meta console</div></div>
+            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"><svg viewBox="0 0 12 10"><polyline points="1,5 4,8 11,1" stroke="#fff" stroke-width="2" fill="none"/></svg></div><div class="check-label">Webhook verified successfully (green tick)</div></div>
+            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"><svg viewBox="0 0 12 10"><polyline points="1,5 4,8 11,1" stroke="#fff" stroke-width="2" fill="none"/></svg></div><div class="check-label">Messages webhook field subscribed</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="step" id="test">
+        <div class="step-hdr" onclick="toggleStep(this)">
+          <div class="step-dot">✓</div>
+          <div class="step-name">Final System Test</div>
+          <div class="step-tag">confirm everything works end-to-end</div>
+          <div class="step-chevron">▼</div>
+        </div>
+        <div class="step-body">
+          <div class="success-box"><div class="ib-label">🎉 You're nearly live — run these tests</div>Each test confirms one part of the full pipeline is working.</div>
+          <div class="checklist">
+            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"><svg viewBox="0 0 12 10"><polyline points="1,5 4,8 11,1" stroke="#fff" stroke-width="2" fill="none"/></svg></div><div class="check-label">✅ Health check: visit https://YOUR-URL.railway.app/health — should return JSON with "status":"online"</div></div>
+            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"><svg viewBox="0 0 12 10"><polyline points="1,5 4,8 11,1" stroke="#fff" stroke-width="2" fill="none"/></svg></div><div class="check-label">✅ WhatsApp: send "Hello" to your test number — Reception Agent replies within 5 seconds</div></div>
+            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"><svg viewBox="0 0 12 10"><polyline points="1,5 4,8 11,1" stroke="#fff" stroke-width="2" fill="none"/></svg></div><div class="check-label">✅ Google Sheets: after WhatsApp test, check your spreadsheet — Clients tab should have a new row</div></div>
+            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"><svg viewBox="0 0 12 10"><polyline points="1,5 4,8 11,1" stroke="#fff" stroke-width="2" fill="none"/></svg></div><div class="check-label">✅ Director alert: check Director WhatsApp — should receive notification about the test client</div></div>
+            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"><svg viewBox="0 0 12 10"><polyline points="1,5 4,8 11,1" stroke="#fff" stroke-width="2" fill="none"/></svg></div><div class="check-label">✅ Website: visit samcybernetix.github.io/fictional-carnival — WhatsApp button visible bottom-right</div></div>
+            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"><svg viewBox="0 0 12 10"><polyline points="1,5 4,8 11,1" stroke="#fff" stroke-width="2" fill="none"/></svg></div><div class="check-label">✅ AI Chat: click the 🤖 button on website — chat opens and replies to a test message</div></div>
+            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"><svg viewBox="0 0 12 10"><polyline points="1,5 4,8 11,1" stroke="#fff" stroke-width="2" fill="none"/></svg></div><div class="check-label">✅ Daily summary: trigger manually via POST /api/trigger/daily-summary — Director receives WhatsApp briefing</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DONE STATE -->
+  <div style="text-align:center;padding:48px 0;border-top:1px solid var(--border);margin-top:32px;">
+    <div style="font-size:48px;margin-bottom:16px">🎉</div>
+    <div style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:var(--gold-l);margin-bottom:8px">KJ AI System — Fully Live</div>
+    <div style="font-size:14px;color:var(--muted);max-width:480px;margin:0 auto 24px">24/7 WhatsApp reception · Auto PDF quotes · M-Pesa payments · Google Sheets sync · Daily AI briefings · All 47 counties</div>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+      <div style="background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:10px;padding:10px 20px;font-size:12px;color:var(--green)">✅ Phase 1–4 Deployed</div>
+      <div style="background:rgba(212,160,23,.08);border:1px solid rgba(212,160,23,.2);border-radius:10px;padding:10px 20px;font-size:12px;color:var(--gold)">📊 Phase 5 → Client Portal</div>
+    </div>
+  </div>
+
+</div><!-- /content -->
+
+<!-- BOTTOM BAR -->
+<div class="bottom-bar">
+  <button class="btn-sec" onclick="markAllDone()">✓ Mark All Done</button>
+  <div class="progress-overall"><div class="progress-overall-fill" id="overallProgress"></div></div>
+  <div class="progress-pct" id="progressPct">0%</div>
+  <button class="btn-primary" onclick="printGuide()">🖨 Print Guide</button>
+</div>
+
+<script>
+// ── ACCORDION ──
+function toggleStep(hdr){
+  const step=hdr.parentElement;
+  step.classList.toggle('open');
+}
+
+// ── CHECKLIST ──
+let totalChecks=0,doneChecks=0;
+function initChecks(){
+  totalChecks=document.querySelectorAll('.check-item').length;
+}
+function toggleCheck(el){
+  el.classList.toggle('checked');
+  doneChecks=document.querySelectorAll('.check-item.checked').length;
+  updateProgress();
+}
+function updateProgress(){
+  const pct=totalChecks?Math.round(doneChecks/totalChecks*100):0;
+  document.getElementById('overallProgress').style.width=pct+'%';
+  document.getElementById('progressPct').textContent=pct+'%';
+  document.getElementById('sbProgress').style.width=pct+'%';
+  document.getElementById('sbProgressLabel').textContent=`${doneChecks} of ${totalChecks} steps complete`;
+}
+function markAllDone(){
+  document.querySelectorAll('.check-item:not(.checked)').forEach(el=>el.click());
+}
+
+// ── COPY ──
+function copyEnv(id,btn){
+  const el=document.getElementById(id);
+  const text=el.innerText.replace(/📋 Copy All|📋 Copy/g,'').trim();
+  navigator.clipboard.writeText(text).then(()=>{
+    btn.textContent='✅ Copied!';btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent='📋 Copy';btn.classList.remove('copied');},2500);
+  });
+}
+function copyBlock(btn){
+  const block=btn.parentElement;
+  const text=block.innerText.replace(/📋 Copy|bash|javascript/g,'').trim();
+  navigator.clipboard.writeText(text).then(()=>{
+    btn.textContent='✅';
+    setTimeout(()=>btn.textContent='📋 Copy',2000);
+  });
+}
+
+// ── SCROLL ──
+function scrollTo(id){
+  const el=document.getElementById(id);
+  if(el)el.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+// ── PRINT ──
+function printGuide(){window.print();}
+
+// ── INIT ──
+initChecks();
+updateProgress();
+</script>
+</body>
+</html>
+
